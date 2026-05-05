@@ -6,9 +6,9 @@ function AlertHistory() {
   const [alerts, setAlerts] = useState([]);
 
   useEffect(() => {
-    fetch("http://localhost:5000/alerts")
-      .then(res => res.json())
-      .then(setAlerts);
+   fetch("https://iot-healthcare-dihz.onrender.com/alerts")
+  .then(res => res.json())
+  .then(setAlerts);
   }, []);
 
   return (

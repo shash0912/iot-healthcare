@@ -11,17 +11,17 @@ function Dashboard() {
   // 🔁 Load data
   useEffect(() => {
     const load = () => {
-      fetch("http://localhost:5000/patients")
-        .then(res => res.json())
-        .then(setPatients);
+      fetch("https://iot-healthcare-dihz.onrender.com/patients")
+      .then(res => res.json())
+      .then(setPatients);
 
-      fetch("http://localhost:5000/alerts")
-        .then(res => res.json())
-        .then(setAlerts);
+      fetch("https://iot-healthcare-dihz.onrender.com/alerts")
+      .then(res => res.json())
+      .then(setAlerts);
 
-      fetch("http://localhost:5000/blocks")
-        .then(res => res.json())
-        .then(setBlocks);
+      fetch("https://iot-healthcare-dihz.onrender.com/blocks")
+      .then(res => res.json())
+      .then(setBlocks);
     };
 
     load();

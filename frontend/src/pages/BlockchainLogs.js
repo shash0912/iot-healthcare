@@ -6,9 +6,9 @@ function BlockchainLogs() {
   const [blocks, setBlocks] = useState([]);
 
   useEffect(() => {
-    fetch("http://localhost:5000/blocks")
-      .then(res => res.json())
-      .then(setBlocks);
+    fetch("https://iot-healthcare-dihz.onrender.com/blocks")
+  .then(res => res.json())
+  .then(setBlocks);
   }, []);
 
   return (

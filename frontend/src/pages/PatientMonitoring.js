@@ -6,9 +6,9 @@ function Monitoring() {
 
   useEffect(() => {
     const interval = setInterval(() => {
-      fetch("http://localhost:5000/patients")
-        .then(res => res.json())
-        .then(setPatients);
+      fetch("https://iot-healthcare-dihz.onrender.com/patients")
+      .then(res => res.json())
+      .then(setPatients);
     }, 3000);
 
     return () => clearInterval(interval);

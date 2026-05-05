@@ -16,14 +16,12 @@ function Login() {
 
     try {
       setLoading(true);
-
-      const res = await fetch("http://localhost:5000/login", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json"
-        },
-        body: JSON.stringify({ username, password })
-      });
+const res = await fetch("https://iot-healthcare-dihz.onrender.com/login", {  method: "POST",
+  headers: {
+    "Content-Type": "application/json"
+  },
+  body: JSON.stringify({ username, password })
+});
 
       const data = await res.json();
 

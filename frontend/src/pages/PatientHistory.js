@@ -6,9 +6,9 @@ function PatientHistory() {
   const [history, setHistory] = useState([]);
 
   useEffect(() => {
-    fetch("http://localhost:5000/history")
-      .then(res => res.json())
-      .then(setHistory);
+    fetch("https://iot-healthcare-dihz.onrender.com/history")
+  .then(res => res.json())
+  .then(setHistory);
   }, []);
 
   return (
