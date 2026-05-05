@@ -1,7 +1,7 @@
 import { BrowserRouter, Routes, Route, useLocation, Navigate } from "react-router-dom";
 import { AnimatePresence } from "framer-motion";
 
-import Home from "./pages/Home";
+// ✅ move imports to top (only change)
 import Login from "./pages/Login";
 import Dashboard from "./pages/AdminDashboard";
 import PatientMonitoring from "./pages/PatientMonitoring";
