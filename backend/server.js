@@ -10,14 +10,18 @@ app.use(express.json());
 /* =========================
    MongoDB Connection
 ========================= */
+
 mongoose.connect(process.env.MONGO_URI)
-  .then(() => console.log("MongoDB Connected"))
-  .catch(err => console.log(err));
+  .then(() => console.log("✅ MongoDB Connected"))
+  .catch(err => console.log("❌ MongoDB Error:", err));
 
-const PORT = process.env.PORT || 5000;
+mongoose.connection.once("open", () => {
+  console.log("🔥 DB Ready");
 
-app.listen(PORT, () => {
-  console.log("Server running on port " + PORT);
+  const PORT = process.env.PORT || 5000;
+  app.listen(PORT, () => {
+    console.log("🚀 Server running on port " + PORT);
+  });
 });
 
 /* =========================
@@ -58,6 +62,7 @@ const Block = mongoose.model("Block", BlockSchema);
 /* =========================
    Login API
 ========================= */
+
 const users = [
   { username: "admin", password: "admin123" },
   { username: "doctor", password: "doc123" }
@@ -76,6 +81,7 @@ app.post("/login", (req, res) => {
 /* =========================
    Hash Function
 ========================= */
+
 function createHash(data) {
   return crypto
     .createHash("sha256")
@@ -84,8 +90,9 @@ function createHash(data) {
 }
 
 /* =========================
-   Generate Patient Data
+   Generate Smart Data
 ========================= */
+
 async function generateData() {
   const ids = ["P001", "P002", "P003", "P004", "P005"];
   const results = [];
@@ -113,56 +120,28 @@ async function generateData() {
       timestamp
     };
 
-    // 🔍 Get last record of this patient
+    // Get last record of this patient
     const lastRecord = await Patient.findOne({ patientId: id })
       .sort({ _id: -1 });
-
-    // 🔍 Build current reasons
-    let reasons = [];
-    if (heartRate > 100) reasons.push("High Heart Rate");
-    if (temperature > 37.5) reasons.push("High Temperature");
-    if (spo2 < 95) reasons.push("Low SpO2");
-
-    const newReason = reasons.join(", ");
-
-    let shouldCreateAlert = false;
-
-    if (reasons.length > 0) {
-      if (!lastRecord) {
-        // first time critical
-        shouldCreateAlert = true;
-      } else {
-        // check last alert
-        const lastAlert = await Alert.findOne({ patientId: id })
-          .sort({ _id: -1 });
-
-        if (!lastAlert) {
-          shouldCreateAlert = true;
-        } else {
-          // 🔥 compare reason
-          if (lastAlert.reason !== newReason) {
-            shouldCreateAlert = true;
-          }
-        }
-      }
-    }
 
     // Save patient record
     await Patient.create(record);
 
-    // Create alert only if NEW condition
-    if (shouldCreateAlert) {
-      await Alert.create({
-        patientId: id,
-        reason: newReason,
-        heartRate,
-        temperature,
-        spo2,
-        timestamp
-      });
+    // 🚨 ALERT ONLY IF STATUS CHANGED
+    if (!lastRecord || lastRecord.status !== status) {
+      if (status === "CRITICAL") {
+        await Alert.create({
+          patientId: id,
+          reason: "Vitals crossed safe threshold",
+          heartRate,
+          temperature,
+          spo2,
+          timestamp
+        });
+      }
     }
 
-    // Blockchain block
+    // 🔗 Blockchain
     const lastBlock = await Block.findOne().sort({ index: -1 });
 
     const newBlock = {
@@ -173,7 +152,6 @@ async function generateData() {
     };
 
     newBlock.hash = createHash(newBlock);
-
     await Block.create(newBlock);
 
     results.push(record);
@@ -186,33 +164,51 @@ async function generateData() {
    APIs
 ========================= */
 
+// Live patients
 app.get("/patients", async (req, res) => {
-  const data = await generateData();
-  res.json(data);
+  try {
+    const data = await generateData();
+    res.json(data);
+  } catch (err) {
+    console.error("PATIENT ERROR:", err);
+    res.status(500).json({ error: "Internal Server Error" });
+  }
 });
 
+// History
 app.get("/history", async (req, res) => {
-  const data = await Patient.find().sort({ _id: -1 }).limit(50);
-  res.json(data);
+  try {
+    const data = await Patient.find().sort({ _id: -1 }).limit(50);
+    res.json(data);
+  } catch (err) {
+    console.error("HISTORY ERROR:", err);
+    res.status(500).json({ error: "Internal Server Error" });
+  }
 });
 
+// Alerts
 app.get("/alerts", async (req, res) => {
-  const data = await Alert.find().sort({ _id: -1 }).limit(20);
-  res.json(data);
+  try {
+    const data = await Alert.find().sort({ _id: -1 }).limit(20);
+    res.json(data);
+  } catch (err) {
+    console.error("ALERT ERROR:", err);
+    res.status(500).json({ error: "Internal Server Error" });
+  }
 });
 
+// Blockchain logs
 app.get("/blocks", async (req, res) => {
-  const blocks = await Block.find().sort({ index: -1 }).limit(20);
-  res.json(blocks);
+  try {
+    const blocks = await Block.find().sort({ index: -1 }).limit(20);
+    res.json(blocks);
+  } catch (err) {
+    console.error("BLOCK ERROR:", err);
+    res.status(500).json({ error: "Internal Server Error" });
+  }
 });
 
+// Root
 app.get("/", (req, res) => {
   res.send("Backend running with smart alerts");
-});
-
-/* =========================
-   Start Server
-========================= */
-app.listen(5000, () => {
-  console.log("Server running on port 5000");
 });
