@@ -20,16 +20,23 @@ function Dashboard() {
     }
   }, [navigate]);
 
-  // 📡 AUTO REFRESH
+  // 📡 FETCH DATA
   useEffect(() => {
-    const fetchData = () => {
-      fetch("https://iot-healthcare-dihz.onrender.com/patients")
-        .then(res => res.json())
-        .then(setPatients);
+    const fetchData = async () => {
+      try {
+        const pRes = await fetch("https://iot-healthcare-dihz.onrender.com/patients");
+        const hRes = await fetch("https://iot-healthcare-dihz.onrender.com/history");
 
-      fetch("https://iot-healthcare-dihz.onrender.com/history")
-        .then(res => res.json())
-        .then(setHistory);
+        const pData = await pRes.json();
+        const hData = await hRes.json();
+
+        setPatients(Array.isArray(pData) ? pData : []);
+        setHistory(Array.isArray(hData) ? hData : []);
+      } catch (err) {
+        console.error("FETCH ERROR:", err);
+        setPatients([]);
+        setHistory([]);
+      }
     };
 
     fetchData();
@@ -37,17 +44,17 @@ function Dashboard() {
     return () => clearInterval(interval);
   }, []);
 
-  // 🔴 SOUND ALERT
+  // 🔴 ALERT SOUND
   useEffect(() => {
     if (patients.some(p => p.status === "CRITICAL")) {
       const audio = new Audio("https://www.soundjay.com/buttons/beep-01a.mp3");
-      audio.play();
+      audio.play().catch(() => {});
     }
   }, [patients]);
 
   // 🔍 FILTER
   const filtered = patients.filter(p =>
-    p.patientId.toLowerCase().includes(search.toLowerCase())
+    p.patientId?.toLowerCase().includes(search.toLowerCase())
   );
 
   return (
@@ -71,7 +78,7 @@ function Dashboard() {
             className="search"
           />
 
-          {/* KPI CARDS */}
+          {/* KPI */}
           <div className="card-grid">
             <div className="card blue">
               <h3>Total</h3>
@@ -89,54 +96,125 @@ function Dashboard() {
             </div>
           </div>
 
-          {/* PATIENT CARDS */}
+          {/* PATIENTS */}
           <div className="card">
             <h3>Live Patients</h3>
-            <div className="grid">
-              {filtered.map((p, i) => (
-                <div
-                  key={i}
-                  className={`patient-card ${p.status === "CRITICAL" ? "critical" : ""}`}
-                >
-                  <h4>{p.patientId}</h4>
-                  <p>❤️ {p.heartRate}</p>
-                  <p>🌡 {p.temperature}</p>
-                  <p>🫁 {p.spo2}</p>
-                  <p>🩺 {p.bp}</p>
-                  <span className={p.status}>{p.status}</span>
-                </div>
-              ))}
-            </div>
+
+            {filtered.length === 0 ? (
+              <p style={{ textAlign: "center", opacity: 0.7 }}>
+                No patient data available
+              </p>
+            ) : (
+              <div className="grid">
+                {filtered.map((p, i) => (
+                  <div
+                    key={i}
+                    className={`patient-card ${p.status === "CRITICAL" ? "critical" : ""}`}
+                  >
+                    <h4>{p.patientId}</h4>
+                    <p>❤️ {p.heartRate}</p>
+                    <p>🌡 {p.temperature}</p>
+                    <p>🫁 {p.spo2}</p>
+                    <p>🩺 {p.bp}</p>
+                    <span className={p.status}>{p.status}</span>
+                  </div>
+                ))}
+              </div>
+            )}
           </div>
 
-          {/* LIVE CHART */}
+          {/* 🔥 ICU LIVE CHART */}
           <div className="card">
             <h3>Live Vitals</h3>
-            <ResponsiveContainer width="100%" height={300}>
-              <LineChart data={patients}>
-                <CartesianGrid strokeDasharray="3 3" />
-                <XAxis dataKey="patientId" />
-                <YAxis />
-                <Tooltip />
-                <Line type="monotone" dataKey="heartRate" />
-                <Line type="monotone" dataKey="spo2" />
-              </LineChart>
-            </ResponsiveContainer>
+
+            {patients.length > 0 && (
+              <ResponsiveContainer width="100%" height={300}>
+                <LineChart data={patients}>
+                  <CartesianGrid stroke="#1e293b" strokeDasharray="4 4" />
+
+                  <XAxis dataKey="patientId" tick={{ fill: "#94a3b8" }} />
+                  <YAxis tick={{ fill: "#94a3b8" }} />
+
+                  <Tooltip
+                    contentStyle={{
+                      backgroundColor: "#020617",
+                      border: "1px solid #1e293b",
+                      borderRadius: "10px"
+                    }}
+                  />
+
+                  {/* ❤️ HEART */}
+                  <Line
+                    type="monotone"
+                    dataKey="heartRate"
+                    stroke="#ef4444"
+                    strokeWidth={3}
+                    dot={false}
+                    activeDot={{ r: 8 }}
+                    isAnimationActive
+                    animationDuration={1000}
+                  />
+
+                  {/* 🫁 SPO2 */}
+                  <Line
+                    type="monotone"
+                    dataKey="spo2"
+                    stroke="#22c55e"
+                    strokeWidth={3}
+                    dot={false}
+                    activeDot={{ r: 6 }}
+                    isAnimationActive
+                    animationDuration={1200}
+                  />
+                </LineChart>
+              </ResponsiveContainer>
+            )}
           </div>
 
-          {/* HISTORY CHART */}
+          {/* 🔥 ICU HISTORY */}
           <div className="card">
             <h3>History Trend</h3>
-            <ResponsiveContainer width="100%" height={300}>
-              <LineChart data={history.slice(0, 10)}>
-                <CartesianGrid strokeDasharray="3 3" />
-                <XAxis dataKey="timestamp" />
-                <YAxis />
-                <Tooltip />
-                <Line type="monotone" dataKey="heartRate" />
-                <Line type="monotone" dataKey="temperature" />
-              </LineChart>
-            </ResponsiveContainer>
+
+            {history.length > 0 && (
+              <ResponsiveContainer width="100%" height={300}>
+                <LineChart data={history.slice(0, 10)}>
+                  <CartesianGrid stroke="#1e293b" strokeDasharray="4 4" />
+
+                  <XAxis dataKey="timestamp" tick={{ fill: "#94a3b8" }} />
+                  <YAxis tick={{ fill: "#94a3b8" }} />
+
+                  <Tooltip
+                    contentStyle={{
+                      backgroundColor: "#020617",
+                      border: "1px solid #1e293b",
+                      borderRadius: "10px"
+                    }}
+                  />
+
+                  <Line
+                    type="monotone"
+                    dataKey="heartRate"
+                    stroke="#3b82f6"
+                    strokeWidth={3}
+                    dot={false}
+                    activeDot={{ r: 7 }}
+                    isAnimationActive
+                    animationDuration={1200}
+                  />
+
+                  <Line
+                    type="monotone"
+                    dataKey="temperature"
+                    stroke="#f59e0b"
+                    strokeWidth={3}
+                    dot={false}
+                    activeDot={{ r: 7 }}
+                    isAnimationActive
+                    animationDuration={1400}
+                  />
+                </LineChart>
+              </ResponsiveContainer>
+            )}
           </div>
 
         </div>

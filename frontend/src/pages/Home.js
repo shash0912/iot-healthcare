@@ -8,12 +8,14 @@ function Home() {
     <div className="home">
 
       {/* HERO */}
-      <motion.div 
+      <motion.div
         className="hero"
         initial={{ opacity: 0, y: 50 }}
         animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.6 }}
       >
         <h1>🏥 Smart IoMT Healthcare System</h1>
+
         <p>
           Real-time ICU monitoring powered by IoMT, secured with blockchain,
           and enhanced with intelligent alert systems.
@@ -27,7 +29,7 @@ function Home() {
       {/* STATS */}
       <div className="stats">
         {["5+", "24/7", "100%"].map((val, i) => (
-          <motion.div 
+          <motion.div
             key={i}
             className="stat glass"
             whileHover={{ scale: 1.1 }}
@@ -47,10 +49,10 @@ function Home() {
         {[
           ["📡 Real-Time Monitoring", "Track vitals instantly"],
           ["🔴 Smart Alerts", "Detect abnormal conditions"],
-          ["🔗 Blockchain", "Tamper-proof records"],
-          ["📊 Visualization", "Charts for analysis"]
+          ["🔗 Blockchain Security", "Tamper-proof medical records"],
+          ["📊 Data Visualization", "Interactive charts & analytics"]
         ].map((f, i) => (
-          <motion.div 
+          <motion.div
             key={i}
             className="feature-card glass"
             whileHover={{ scale: 1.05 }}
@@ -62,18 +64,20 @@ function Home() {
       </div>
 
       {/* WORKFLOW */}
-      <motion.div 
+      <motion.div
         className="workflow"
         initial={{ opacity: 0 }}
         whileInView={{ opacity: 1 }}
+        transition={{ duration: 0.5 }}
       >
         <h2>System Flow</h2>
+
         <div className="flow">
-          <span>📡 Devices</span>
+          <span>📡 IoMT Devices</span>
           <span>→</span>
           <span>⚙️ Controller</span>
           <span>→</span>
-          <span>🗄 DB</span>
+          <span>🗄 MongoDB</span>
           <span>→</span>
           <span>🔗 Blockchain</span>
           <span>→</span>
@@ -82,12 +86,14 @@ function Home() {
       </motion.div>
 
       {/* CTA */}
-      <motion.div 
+      <motion.div
         className="cta"
         initial={{ scale: 0.8 }}
         whileInView={{ scale: 1 }}
+        transition={{ duration: 0.5 }}
       >
         <h2>Ready to Experience Smart Healthcare?</h2>
+
         <button onClick={() => navigate("/login")}>
           Login Now
         </button>

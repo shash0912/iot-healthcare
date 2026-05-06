@@ -9,39 +9,58 @@ function Login() {
   const navigate = useNavigate();
 
   const login = async () => {
-  try {
-    setLoading(true);
-
-    const res = await fetch("https://iot-healthcare-dihz.onrender.com/login", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json"
-      },
-      body: JSON.stringify({ username, password })
-    });
-
-    const data = await res.json();
-
-    if (data.success) {
-      localStorage.setItem("user", username);
-      navigate("/dashboard");
-    } else {
-      alert("Invalid credentials");
+    if (!username || !password) {
+      alert("Enter username and password");
+      return;
     }
 
-  } catch (err) {
-    console.error(err);
-    alert("Server error");
-  } finally {
-    setLoading(false);
-  }
-};
+    try {
+      setLoading(true);
+
+      const res = await fetch("https://iot-healthcare-dihz.onrender.com/login", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json"
+        },
+        body: JSON.stringify({ username, password })
+      });
+
+      // ❗ Check response
+      if (!res.ok) {
+        throw new Error("Server not responding");
+      }
+
+      const data = await res.json();
+
+      // ❗ Extra safety check
+      if (data && data.success) {
+        localStorage.setItem("user", username);
+
+        // slight delay for smoother UX
+        setTimeout(() => {
+          navigate("/dashboard");
+        }, 300);
+
+      } else {
+        alert("Invalid credentials");
+      }
+
+    } catch (err) {
+      console.error("LOGIN ERROR:", err);
+      alert("Server error / Backend not reachable");
+    } finally {
+      setLoading(false);
+    }
+  };
+
   return (
     <div className="login-bg">
       <div className="login-card">
-        <h1>Blockchain Based Muilprotocol IoMT Controller</h1>
+
+        <h1>🔗 Blockchain Based Multi-Protocol IoMT Controller</h1>
         <h2>🏥 Smart Hospital System</h2>
-        <p style={{fontSize:"12px", marginBottom:"15px"}}>
+
+        <p style={{ fontSize: "12px", marginBottom: "15px" }}>
           Secure IoMT Patient Monitoring Login
         </p>
 
@@ -62,7 +81,7 @@ function Login() {
           {loading ? "Logging in..." : "Login"}
         </button>
 
-        <p style={{fontSize:"11px", marginTop:"10px", color:"gray"}}>
+        <p style={{ fontSize: "11px", marginTop: "10px", color: "gray" }}>
           Demo: admin / admin123
         </p>
 
