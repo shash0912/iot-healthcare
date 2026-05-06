@@ -1,5 +1,6 @@
-import { useNavigate } from "react-router-dom";
+import { useNavigate, Link } from "react-router-dom";
 import { motion } from "framer-motion";
+import "../App.css";
 
 function Home() {
   const navigate = useNavigate();
@@ -20,10 +21,6 @@ function Home() {
           Real-time ICU monitoring powered by IoMT, secured with blockchain,
           and enhanced with intelligent alert systems.
         </p>
-
-        <button onClick={() => navigate("/login")}>
-          Enter Dashboard →
-        </button>
       </motion.div>
 
       {/* STATS */}
@@ -94,8 +91,12 @@ function Home() {
       >
         <h2>Ready to Experience Smart Healthcare?</h2>
 
-        <button onClick={() => navigate("/login")}>
-          Login Now
+        {/* ✅ FIXED BUTTON */}
+        <button
+          className="btn primary"
+          onClick={() => navigate("/login")}
+        >
+          🚀 Login Now
         </button>
       </motion.div>
 
