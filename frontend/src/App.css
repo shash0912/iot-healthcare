@@ -291,3 +291,139 @@ body {
   display: inline-block;
   font-weight: 500;
 }
+/* ===== SIDEBAR FIX ===== */
+.sidebar {
+  width: 240px;
+  height: 100vh;
+  background: linear-gradient(180deg, #020617, #0f172a);
+  padding: 25px;
+  display: flex;
+  flex-direction: column;   /* 🔥 THIS FIXES YOUR ISSUE */
+  gap: 20px;
+  border-right: 1px solid #1e293b;
+}
+
+/* LOGO */
+.logo {
+  font-size: 20px;
+  font-weight: 600;
+  margin-bottom: 20px;
+}
+
+/* NAV LINKS */
+.nav-links {
+  display: flex;
+  flex-direction: column;   /* 🔥 vertical menu */
+  gap: 12px;
+}
+
+/* LINKS */
+.nav-links a {
+  text-decoration: none;
+  color: #94a3b8;
+  padding: 10px 14px;
+  border-radius: 10px;
+  transition: 0.3s;
+}
+
+/* HOVER */
+.nav-links a:hover {
+  background: rgba(59, 130, 246, 0.15);
+  color: white;
+}
+
+/* ACTIVE LINK */
+.nav-links a.active {
+  background: linear-gradient(135deg, #3b82f6, #2563eb);
+  color: white;
+}
+/* ===== LOGIN PAGE ===== */
+
+.login-container {
+  height: 100vh;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  background: radial-gradient(circle at top, #0f172a, #020617);
+}
+
+/* CARD */
+.login-card {
+  width: 340px;
+  padding: 30px;
+  border-radius: 18px;
+  background: rgba(15, 23, 42, 0.85);
+  border: 1px solid #1e293b;
+  backdrop-filter: blur(14px);
+  box-shadow: 0 20px 40px rgba(0,0,0,0.6);
+  text-align: center;
+}
+
+/* TITLE */
+.login-title {
+  font-size: 24px;
+  font-weight: 700;
+  margin-bottom: 5px;
+  background: linear-gradient(to right, #3b82f6, #22c55e);
+
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+.login-subtitle {
+  font-size: 13px;
+  opacity: 0.7;
+  margin-bottom: 20px;
+}
+
+/* INPUTS */
+.input-group {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.input-group input {
+  padding: 12px;
+  border-radius: 10px;
+  border: 1px solid #1e293b;
+  background: #020617;
+  color: white;
+  outline: none;
+  transition: 0.3s;
+}
+
+.input-group input:focus {
+  border-color: #3b82f6;
+}
+
+/* BUTTON */
+.login-btn {
+  margin-top: 18px;
+  width: 100%;
+  padding: 12px;
+  border-radius: 12px;
+  border: none;
+  background: linear-gradient(135deg, #3b82f6, #2563eb);
+  color: white;
+  font-weight: 500;
+  cursor: pointer;
+  transition: 0.3s;
+}
+
+.login-btn:hover {
+  transform: scale(1.05);
+}
+
+.login-btn:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+/* HINT */
+.login-hint {
+  font-size: 11px;
+  margin-top: 12px;
+  color: #94a3b8;
+}

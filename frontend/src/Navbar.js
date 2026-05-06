@@ -1,14 +1,32 @@
-import { Link } from "react-router-dom";
+import { Link, useLocation } from "react-router-dom";
+import "../App.css";
 
 function Navbar() {
+  const location = useLocation();
+
+  const navItems = [
+    { path: "/dashboard", label: "📊 Dashboard" },
+    { path: "/monitor", label: "📡 Monitoring" },
+    { path: "/alerts", label: "🚨 Alerts" },
+    { path: "/logs", label: "🔗 Blockchain" },
+    { path: "/history", label: "📜 History" }
+  ];
+
   return (
     <div className="sidebar">
-      <h2>🏥 IoMT Care</h2>
-      <Link to="/dashboard">Dashboard</Link>
-      <Link to="/monitor">Monitoring</Link>
-      <Link to="/alerts">Alerts</Link>
-      <Link to="/logs">Blockchain</Link>
-      <Link to="/history">History</Link>
+      <h2 className="logo">🏥 IoMT Care</h2>
+
+      <div className="nav-links">
+        {navItems.map((item, i) => (
+          <Link
+            key={i}
+            to={item.path}
+            className={location.pathname === item.path ? "active" : ""}
+          >
+            {item.label}
+          </Link>
+        ))}
+      </div>
     </div>
   );
 }

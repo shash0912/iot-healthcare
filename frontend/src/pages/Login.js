@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
+import "../App.css";
 
 function Login() {
   const [username, setUsername] = useState("");
@@ -25,22 +26,13 @@ function Login() {
         body: JSON.stringify({ username, password })
       });
 
-      // ❗ Check response
-      if (!res.ok) {
-        throw new Error("Server not responding");
-      }
+      if (!res.ok) throw new Error("Server not responding");
 
       const data = await res.json();
 
-      // ❗ Extra safety check
       if (data && data.success) {
         localStorage.setItem("user", username);
-
-        // slight delay for smoother UX
-        setTimeout(() => {
-          navigate("/dashboard");
-        }, 300);
-
+        setTimeout(() => navigate("/dashboard"), 300);
       } else {
         alert("Invalid credentials");
       }
@@ -54,38 +46,44 @@ function Login() {
   };
 
   return (
-    <div className="login-bg">
+    <div className="login-container">
+
       <div className="login-card">
 
-        <h1>🔗 Blockchain Based Multi-Protocol IoMT Controller</h1>
-        <h2>🏥 Smart Hospital System</h2>
-
-        <p style={{ fontSize: "12px", marginBottom: "15px" }}>
-          Secure IoMT Patient Monitoring Login
+        <h1 className="login-title">🏥 IoMT Healthcare</h1>
+        <p className="login-subtitle">
+          Secure Blockchain-Based Patient Monitoring
         </p>
 
-        <input
-          placeholder="Username"
-          value={username}
-          onChange={(e) => setUsername(e.target.value)}
-        />
+        <div className="input-group">
+          <input
+            placeholder="Username"
+            value={username}
+            onChange={(e) => setUsername(e.target.value)}
+          />
 
-        <input
-          type="password"
-          placeholder="Password"
-          value={password}
-          onChange={(e) => setPassword(e.target.value)}
-        />
+          <input
+            type="password"
+            placeholder="Password"
+            value={password}
+            onChange={(e) => setPassword(e.target.value)}
+          />
+        </div>
 
-        <button onClick={login} disabled={loading}>
+        <button
+          className="login-btn"
+          onClick={login}
+          disabled={loading}
+        >
           {loading ? "Logging in..." : "Login"}
         </button>
 
-        <p style={{ fontSize: "11px", marginTop: "10px", color: "gray" }}>
+        <p className="login-hint">
           Demo: admin / admin123
         </p>
 
       </div>
+
     </div>
   );
 }
