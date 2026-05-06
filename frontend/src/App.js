@@ -9,7 +9,7 @@ import BlockchainLogs from "./pages/BlockchainLogs";
 import AlertHistory from "./pages/AlertHistory";
 import PatientHistory from "./pages/PatientHistory";
 import Home from "./pages/Home";
-import '../App.css';
+import './App.css';
 
 function AnimatedRoutes() {
   const location = useLocation();
