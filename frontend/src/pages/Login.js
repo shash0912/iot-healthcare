@@ -9,41 +9,33 @@ function Login() {
   const navigate = useNavigate();
 
   const login = async () => {
-    if (!username || !password) {
-      alert("Please enter username and password");
-      return;
+  try {
+    setLoading(true);
+
+    const res = await fetch("https://iot-healthcare-dihz.onrender.com/login", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json"
+      },
+      body: JSON.stringify({ username, password })
+    });
+
+    const data = await res.json();
+
+    if (data.success) {
+      localStorage.setItem("user", username);
+      navigate("/dashboard");
+    } else {
+      alert("Invalid credentials");
     }
 
-    try {
-      setLoading(true);
-const res = await fetch("https://iot-healthcare-dihz.onrender.com/login", {  method: "POST",
-  headers: {
-    "Content-Type": "application/json"
-  },
-  body: JSON.stringify({ username, password })
-});
-
-      const data = await res.json();
-
-      if (data.success) {
-        localStorage.setItem("user", username);
-
-        // smooth redirect delay
-        setTimeout(() => {
-          navigate("/dashboard");
-        }, 500);
-
-      } else {
-        alert("Invalid credentials");
-      }
-
-    } catch (err) {
-      alert("Server error. Check backend.");
-    } finally {
-      setLoading(false);
-    }
-  };
-
+  } catch (err) {
+    console.error(err);
+    alert("Server error");
+  } finally {
+    setLoading(false);
+  }
+};
   return (
     <div className="login-bg">
       <div className="login-card">
