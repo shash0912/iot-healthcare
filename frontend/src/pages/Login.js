@@ -47,7 +47,7 @@ const res = await fetch("https://iot-healthcare-dihz.onrender.com/login", {  met
   return (
     <div className="login-bg">
       <div className="login-card">
-
+        <h1>Blockchain Based Muilprotocol IoMT Controller</h1>
         <h2>🏥 Smart Hospital System</h2>
         <p style={{fontSize:"12px", marginBottom:"15px"}}>
           Secure IoMT Patient Monitoring Login

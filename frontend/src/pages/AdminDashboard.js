@@ -1,124 +1,147 @@
 import { useEffect, useState } from "react";
+import { useNavigate } from "react-router-dom";
 import Navbar from "../Navbar";
+import PageWrapper from "../PageWrapper";
+import {
+  LineChart, Line, XAxis, YAxis, Tooltip,
+  CartesianGrid, ResponsiveContainer
+} from "recharts";
 
 function Dashboard() {
-  const user = localStorage.getItem("user");
-
   const [patients, setPatients] = useState([]);
-  const [alerts, setAlerts] = useState([]);
-  const [blocks, setBlocks] = useState([]);
+  const [history, setHistory] = useState([]);
+  const [search, setSearch] = useState("");
+  const navigate = useNavigate();
 
-  // 🔁 Load data
+  // 🔐 AUTH CHECK
   useEffect(() => {
-    const load = () => {
+    if (!localStorage.getItem("user")) {
+      navigate("/login");
+    }
+  }, [navigate]);
+
+  // 📡 AUTO REFRESH
+  useEffect(() => {
+    const fetchData = () => {
       fetch("https://iot-healthcare-dihz.onrender.com/patients")
-      .then(res => res.json())
-      .then(setPatients);
+        .then(res => res.json())
+        .then(setPatients);
 
-      fetch("https://iot-healthcare-dihz.onrender.com/alerts")
-      .then(res => res.json())
-      .then(setAlerts);
-
-      fetch("https://iot-healthcare-dihz.onrender.com/blocks")
-      .then(res => res.json())
-      .then(setBlocks);
+      fetch("https://iot-healthcare-dihz.onrender.com/history")
+        .then(res => res.json())
+        .then(setHistory);
     };
 
-    load();
-    const t = setInterval(load, 4000); // auto-refresh
-
-    return () => clearInterval(t);
+    fetchData();
+    const interval = setInterval(fetchData, 5000);
+    return () => clearInterval(interval);
   }, []);
 
-  // 📊 Derived stats
-  const totalPatients = patients.length;
-  const criticalCount = patients.filter(p => p.status === "CRITICAL").length;
-  const alertCount = alerts.length;
-  const blockCount = blocks.length;
+  // 🔴 SOUND ALERT
+  useEffect(() => {
+    if (patients.some(p => p.status === "CRITICAL")) {
+      const audio = new Audio("https://www.soundjay.com/buttons/beep-01a.mp3");
+      audio.play();
+    }
+  }, [patients]);
+
+  // 🔍 FILTER
+  const filtered = patients.filter(p =>
+    p.patientId.toLowerCase().includes(search.toLowerCase())
+  );
 
   return (
-    <div className="app">
-      <Navbar />
+    <PageWrapper>
+      <div className="app">
+        <Navbar />
 
-      <div className="main">
-        {/* Header */}
-        <div className="header-bar">
-          <div className="patient-name">Welcome, Dr. {user}</div>
-          <div>🟢 System Online</div>
-        </div>
+        <div className="main">
 
-        {/* KPI CARDS */}
-        <div className="grid">
-          <div className="card">
-            <h4>Total Patients</h4>
-            <h2>{totalPatients}</h2>
+          {/* HEADER */}
+          <div className="header">
+            <h2>🏥 ICU Smart Dashboard</h2>
+            <p>👤 {localStorage.getItem("user")}</p>
           </div>
 
-          <div className="card">
-            <h4>Critical Cases</h4>
-            <h2 style={{ color: "red" }}>{criticalCount}</h2>
+          {/* SEARCH */}
+          <input
+            placeholder="Search Patient..."
+            value={search}
+            onChange={(e) => setSearch(e.target.value)}
+            className="search"
+          />
+
+          {/* KPI CARDS */}
+          <div className="card-grid">
+            <div className="card blue">
+              <h3>Total</h3>
+              <p>{patients.length}</p>
+            </div>
+
+            <div className="card green">
+              <h3>Normal</h3>
+              <p>{patients.filter(p => p.status === "NORMAL").length}</p>
+            </div>
+
+            <div className="card red">
+              <h3>Critical</h3>
+              <p>{patients.filter(p => p.status === "CRITICAL").length}</p>
+            </div>
           </div>
 
+          {/* PATIENT CARDS */}
           <div className="card">
-            <h4>Active Alerts</h4>
-            <h2>{alertCount}</h2>
+            <h3>Live Patients</h3>
+            <div className="grid">
+              {filtered.map((p, i) => (
+                <div
+                  key={i}
+                  className={`patient-card ${p.status === "CRITICAL" ? "critical" : ""}`}
+                >
+                  <h4>{p.patientId}</h4>
+                  <p>❤️ {p.heartRate}</p>
+                  <p>🌡 {p.temperature}</p>
+                  <p>🫁 {p.spo2}</p>
+                  <p>🩺 {p.bp}</p>
+                  <span className={p.status}>{p.status}</span>
+                </div>
+              ))}
+            </div>
           </div>
 
+          {/* LIVE CHART */}
           <div className="card">
-            <h4>Blockchain Blocks</h4>
-            <h2>{blockCount}</h2>
+            <h3>Live Vitals</h3>
+            <ResponsiveContainer width="100%" height={300}>
+              <LineChart data={patients}>
+                <CartesianGrid strokeDasharray="3 3" />
+                <XAxis dataKey="patientId" />
+                <YAxis />
+                <Tooltip />
+                <Line type="monotone" dataKey="heartRate" />
+                <Line type="monotone" dataKey="spo2" />
+              </LineChart>
+            </ResponsiveContainer>
           </div>
-        </div>
 
-        {/* LIVE ACTIVITY */}
-        <div className="card" style={{ marginTop: "20px" }}>
-          <h3>Live Activity</h3>
+          {/* HISTORY CHART */}
+          <div className="card">
+            <h3>History Trend</h3>
+            <ResponsiveContainer width="100%" height={300}>
+              <LineChart data={history.slice(0, 10)}>
+                <CartesianGrid strokeDasharray="3 3" />
+                <XAxis dataKey="timestamp" />
+                <YAxis />
+                <Tooltip />
+                <Line type="monotone" dataKey="heartRate" />
+                <Line type="monotone" dataKey="temperature" />
+              </LineChart>
+            </ResponsiveContainer>
+          </div>
 
-          {patients.length === 0 ? (
-            <p>Loading...</p>
-          ) : (
-            patients.map(p => (
-              <p
-                key={p.patientId}
-                className={p.status === "CRITICAL" ? "critical" : "normal"}
-              >
-                {p.patientId} → {p.status} (HR: {p.heartRate}, SpO2: {p.spo2})
-              </p>
-            ))
-          )}
-        </div>
-
-        {/* RECENT ALERTS */}
-        <div className="card" style={{ marginTop: "20px" }}>
-          <h3>Recent Alerts</h3>
-
-          {alerts.length === 0 ? (
-            <p>No alerts</p>
-          ) : (
-            alerts.slice(0, 5).map(a => (
-              <p key={a._id} style={{ color: "red" }}>
-                🚨 {a.patientId} → {a.reason}
-              </p>
-            ))
-          )}
-        </div>
-
-        {/* RECENT BLOCKS */}
-        <div className="card" style={{ marginTop: "20px" }}>
-          <h3>Blockchain Activity</h3>
-
-          {blocks.length === 0 ? (
-            <p>No blocks</p>
-          ) : (
-            blocks.slice(0, 5).map(b => (
-              <p key={b.index}>
-                Block #{b.index} → {b.hash.substring(0, 12)}...
-              </p>
-            ))
-          )}
         </div>
       </div>
-    </div>
+    </PageWrapper>
   );
 }
 

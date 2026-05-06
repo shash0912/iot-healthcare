@@ -1,45 +1,99 @@
-import { Link } from "react-router-dom";
-import Navbar from "../Navbar";
+import { useNavigate } from "react-router-dom";
+import { motion } from "framer-motion";
 
 function Home() {
+  const navigate = useNavigate();
+
   return (
-    <>
-      <Navbar />
+    <div className="home">
 
-      <div style={{
-        minHeight: "100vh",
-        background: "linear-gradient(to right, #0f172a, #2563eb)",
-        color: "white",
-        display: "flex",
-        flexDirection: "column",
-        justifyContent: "center",
-        alignItems: "center",
-        textAlign: "center"
-      }}>
-        <h1 style={{ fontSize: "40px" }}>
-          Blockchain Based IoMT Healthcare System
-        </h1>
-
-        <p style={{ maxWidth: "600px", margin: "20px" }}>
-          Secure, real-time patient monitoring using IoMT devices and blockchain
-          technology for transparency and data integrity.
+      {/* HERO */}
+      <motion.div 
+        className="hero"
+        initial={{ opacity: 0, y: 50 }}
+        animate={{ opacity: 1, y: 0 }}
+      >
+        <h1>🏥 Smart IoMT Healthcare System</h1>
+        <p>
+          Real-time ICU monitoring powered by IoMT, secured with blockchain,
+          and enhanced with intelligent alert systems.
         </p>
 
-        <div>
-          <Link to="/login">
-            <button style={{ margin: "10px", padding: "10px 20px" }}>
-              Login
-            </button>
-          </Link>
+        <button onClick={() => navigate("/login")}>
+          Enter Dashboard →
+        </button>
+      </motion.div>
 
-          <Link to="/dashboard">
-            <button style={{ margin: "10px", padding: "10px 20px" }}>
-              Dashboard
-            </button>
-          </Link>
-        </div>
+      {/* STATS */}
+      <div className="stats">
+        {["5+", "24/7", "100%"].map((val, i) => (
+          <motion.div 
+            key={i}
+            className="stat glass"
+            whileHover={{ scale: 1.1 }}
+          >
+            <h2>{val}</h2>
+            <p>
+              {i === 0 && "Patients"}
+              {i === 1 && "Monitoring"}
+              {i === 2 && "Secure"}
+            </p>
+          </motion.div>
+        ))}
       </div>
-    </>
+
+      {/* FEATURES */}
+      <div className="features">
+        {[
+          ["📡 Real-Time Monitoring", "Track vitals instantly"],
+          ["🔴 Smart Alerts", "Detect abnormal conditions"],
+          ["🔗 Blockchain", "Tamper-proof records"],
+          ["📊 Visualization", "Charts for analysis"]
+        ].map((f, i) => (
+          <motion.div 
+            key={i}
+            className="feature-card glass"
+            whileHover={{ scale: 1.05 }}
+          >
+            <h3>{f[0]}</h3>
+            <p>{f[1]}</p>
+          </motion.div>
+        ))}
+      </div>
+
+      {/* WORKFLOW */}
+      <motion.div 
+        className="workflow"
+        initial={{ opacity: 0 }}
+        whileInView={{ opacity: 1 }}
+      >
+        <h2>System Flow</h2>
+        <div className="flow">
+          <span>📡 Devices</span>
+          <span>→</span>
+          <span>⚙️ Controller</span>
+          <span>→</span>
+          <span>🗄 DB</span>
+          <span>→</span>
+          <span>🔗 Blockchain</span>
+          <span>→</span>
+          <span>📊 Dashboard</span>
+        </div>
+      </motion.div>
+
+      {/* CTA */}
+      <motion.div 
+        className="cta"
+        initial={{ scale: 0.8 }}
+        whileInView={{ scale: 1 }}
+      >
+        <h2>Ready to Experience Smart Healthcare?</h2>
+        <button onClick={() => navigate("/login")}>
+          Login Now
+        </button>
+      </motion.div>
+
+    </div>
   );
 }
 
